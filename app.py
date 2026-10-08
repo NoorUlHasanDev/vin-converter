@@ -35,10 +35,10 @@ st.markdown("""
   .brandbar { display:flex; align-items:center; justify-content:space-between; gap:1rem; padding:1rem 1.25rem; background:#10243a; border-radius:18px; margin-bottom:1rem; box-shadow:0 10px 30px rgba(16,36,58,.12); }
   .brandbar img { width:230px; max-width:55%; height:auto; object-fit:contain; }
   .brandtag { color:#b9c9dc; font-size:.76rem; letter-spacing:.16em; text-transform:uppercase; text-align:right; }
-  .hero { background:linear-gradient(120deg,#10243a 0%,#174c7f 65%,#0878f9 100%); border-radius:20px; padding:1.6rem 1.7rem; color:#fff; margin-bottom:1.15rem; }
-  .hero .eyebrow { text-transform:uppercase; letter-spacing:.18em; font-size:.72rem; color:#aeefff; font-weight:700; }
-  .hero h1 { color:#fff; font-size:2.15rem; line-height:1.15; margin:.4rem 0 .55rem 0; }
-  .hero p { color:#e0ebf8; font-size:1rem; margin:0; max-width:760px; }
+  .hero { background:#ffffff; border:1px solid #d8e6f4; border-radius:8px; padding:1.35rem 1.5rem; color:#10385e; margin-bottom:1.15rem; }
+  .hero .eyebrow { text-transform:uppercase; letter-spacing:.14em; font-size:.72rem; color:#0878f9; font-weight:700; }
+  .hero h1 { color:#10385e; font-size:2.05rem; line-height:1.15; margin:.4rem 0 .55rem 0; }
+  .hero p { color:#526b82; font-size:1rem; margin:0; max-width:760px; }
   .panel { background:white; border:1px solid #e1e8f0; border-radius:16px; padding:1.15rem 1.25rem; box-shadow:0 4px 18px rgba(24,49,78,.035); }
   .notice { background:#fff8e7; border:1px solid #f3dfaa; border-left:5px solid #e4aa24; padding:.9rem 1rem; border-radius:12px; color:#5d4816; margin:1rem 0 1.2rem; }
   div[data-testid="stFileUploader"] { background:white; padding:1.1rem; border-radius:14px; border:1px dashed #9eb4ca; }
@@ -117,8 +117,8 @@ def make_pdf(full_text, vehicle_name, vin, source_name, accent_hex):
     line = HexColor("#C9D8E8")
     navy = HexColor("#0C3154")
     styles = getSampleStyleSheet()
-    styles.add(ParagraphStyle(name="VTitle", parent=styles["Title"], fontName="Helvetica-Bold", fontSize=22, leading=26, alignment=TA_LEFT, textColor=ink, spaceAfter=5))
-    styles.add(ParagraphStyle(name="VSection", parent=styles["Heading2"], fontName="Helvetica-Bold", fontSize=14, leading=17, textColor=ink, spaceBefore=10, spaceAfter=6, keepWithNext=True))
+    styles.add(ParagraphStyle(name="VTitle", parent=styles["Title"], fontName="Helvetica-Bold", fontSize=20, leading=24, alignment=TA_LEFT, textColor=navy, spaceAfter=5))
+    styles.add(ParagraphStyle(name="VSection", parent=styles["Heading2"], fontName="Helvetica-Bold", fontSize=11.5, leading=14, textColor=colors.white, backColor=navy, borderPadding=(6,8,6,8), spaceBefore=9, spaceAfter=5, keepWithNext=True))
     styles.add(ParagraphStyle(name="VSub", parent=styles["Heading3"], fontName="Helvetica-Bold", fontSize=9, leading=12, textColor=ink, spaceBefore=5, spaceAfter=4, keepWithNext=True))
     styles.add(ParagraphStyle(name="VBody", parent=styles["BodyText"], fontName="Helvetica", fontSize=8.2, leading=11, textColor=ink, spaceAfter=3, splitLongWords=1, wordWrap="CJK"))
     styles.add(ParagraphStyle(name="VSmall", parent=styles["BodyText"], fontName="Helvetica", fontSize=7.1, leading=9, textColor=muted, spaceAfter=2))
@@ -127,24 +127,24 @@ def make_pdf(full_text, vehicle_name, vin, source_name, accent_hex):
 
     def header_footer(canvas, doc):
         canvas.saveState(); w,h=letter
+        # Deep-navy report masthead, matching the user's requested reference mockup.
+        canvas.setFillColor(navy); canvas.rect(0, h-.78*inch, w, .78*inch, fill=1, stroke=0)
         if os.path.exists(LOGO_PATH):
-            try: canvas.drawImage(LOGO_PATH, .55*inch, h-.58*inch, width=1.35*inch, height=.40*inch, preserveAspectRatio=True, mask='auto', anchor='c')
+            try: canvas.drawImage(LOGO_PATH, .48*inch, h-.66*inch, width=2.05*inch, height=.48*inch, preserveAspectRatio=True, mask='auto', anchor='c')
             except Exception: pass
-        canvas.setFont('Helvetica-Bold', 8); canvas.setFillColor(ink)
-        canvas.drawRightString(w-.58*inch, h-.31*inch, (vehicle_name or 'Vehicle History Report')[:65])
-        canvas.setFont('Helvetica', 7); canvas.setFillColor(muted)
-        canvas.drawRightString(w-.58*inch, h-.46*inch, 'VIN: '+(vin or 'Not detected'))
-        canvas.setStrokeColor(blue); canvas.setLineWidth(.8); canvas.line(.55*inch,h-.68*inch,w-.55*inch,h-.68*inch)
-        canvas.setStrokeColor(line); canvas.setLineWidth(.55); canvas.line(.55*inch,.62*inch,w-.55*inch,.62*inch)
+        canvas.setFont('Helvetica-Bold', 7.4); canvas.setFillColor(colors.white)
+        canvas.drawRightString(w-.52*inch, h-.30*inch, 'Trusted Vehicle History')
+        canvas.setFont('Helvetica', 7); canvas.drawRightString(w-.52*inch, h-.44*inch, 'Vehicle report copy')
+        canvas.setStrokeColor(line); canvas.setLineWidth(.65); canvas.line(.45*inch,.60*inch,w-.45*inch,.60*inch)
         canvas.setFillColor(muted); canvas.setFont('Helvetica',6.5)
-        canvas.drawString(.55*inch,.43*inch,'Report generated on '+date.today().strftime('%m/%d/%Y'))
-        canvas.drawCentredString(w/2,.43*inch,'vinlookupnow.com')
-        canvas.drawRightString(w-.55*inch,.43*inch,f'Page {doc.page}')
-        canvas.setFont('Helvetica',5.8)
-        canvas.drawString(.55*inch,.27*inch,'Disclaimer: Reformatted from the uploaded source PDF; underlying data has not been independently verified.')
+        canvas.drawString(.48*inch,.41*inch,'Report generated on '+date.today().strftime('%m/%d/%Y'))
+        canvas.drawCentredString(w/2,.41*inch,'vinlookupnow.com')
+        canvas.drawRightString(w-.48*inch,.41*inch,f'Page {doc.page}')
+        canvas.setFont('Helvetica-Oblique',5.5)
+        canvas.drawString(.48*inch,.24*inch,'Reformatted from uploaded source; underlying data has not been independently verified.')
         canvas.restoreState()
 
-    doc=SimpleDocTemplate(output,pagesize=letter,leftMargin=.55*inch,rightMargin=.55*inch,topMargin=.83*inch,bottomMargin=.78*inch,title=f'{vehicle_name} | VinLookUpNow',author='VinLookUpNow')
+    doc=SimpleDocTemplate(output,pagesize=letter,leftMargin=.55*inch,rightMargin=.55*inch,topMargin=.98*inch,bottomMargin=.74*inch,title=f'{vehicle_name} | VinLookUpNow',author='VinLookUpNow')
     story=[]
     lines=clean_lines(full_text,vin)
     joined='\n'.join(lines)
@@ -211,7 +211,7 @@ def make_pdf(full_text, vehicle_name, vin, source_name, accent_hex):
         if section_like(ln):
             flush_group()
             story.append(Paragraph(escape(ln),styles['VSection']))
-            story.append(HRFlowable(width='100%',thickness=.7,color=blue,spaceAfter=5))
+
         else:
             current.append(ln)
     flush_group()
