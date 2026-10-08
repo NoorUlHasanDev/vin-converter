@@ -2,3 +2,6 @@ pdfplumber
 jinja2
 weasyprint
 streamlit
+streamlit
+pdfkit
+jinja2
