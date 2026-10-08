@@ -51,7 +51,7 @@ def parse_pdf(file_bytes):
 
     return data
 
-# Vinlookupnow HTML/CSS Layout Template
+# WeasyPrint Compatible Vinlookupnow HTML/CSS Layout Template
 HTML_TEMPLATE = """
 <!DOCTYPE html>
 <html>
@@ -60,11 +60,11 @@ HTML_TEMPLATE = """
 <style>
   @page {
     size: A4;
-    margin: 15mm;
+    margin: 12mm;
     @bottom-right {
       content: "Page " counter(page) " of " counter(pages);
       font-size: 8pt;
-      color: #666;
+      color: #666666;
     }
   }
   body {
@@ -72,11 +72,13 @@ HTML_TEMPLATE = """
     color: #1e293b;
     margin: 0;
     padding: 0;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
   }
   .header {
-    background-color: #003366;
-    color: white;
-    padding: 20px;
+    background-color: #003366 !important;
+    color: #ffffff;
+    padding: 18px;
     border-radius: 6px;
     margin-bottom: 20px;
   }
@@ -90,30 +92,52 @@ HTML_TEMPLATE = """
     font-size: 18px;
     margin-top: 6px;
     font-weight: 600;
+    color: #ffffff;
   }
   .vin-tag {
     font-size: 12px;
-    background: rgba(255,255,255,0.15);
+    background-color: #1e40af !important;
+    color: #ffffff;
     display: inline-block;
     padding: 4px 10px;
     border-radius: 4px;
     margin-top: 8px;
     font-family: monospace;
   }
-  .grid {
-    display: flex;
-    gap: 15px;
+  /* WeasyPrint CSS Table Layout (Flexbox alternative) */
+  .grid-table {
+    display: table;
+    width: 100%;
     margin-bottom: 20px;
   }
-  .card {
-    flex: 1;
-    background: #f8fafc;
+  .grid-row {
+    display: table-row;
+  }
+  .card-cell {
+    display: table-cell;
+    width: 48%;
+    background-color: #f8fafc !important;
     padding: 15px;
     border-left: 4px solid #0056b3;
     border-radius: 4px;
+    vertical-align: top;
   }
-  .card .label { font-size: 10px; color: #64748b; text-transform: uppercase; font-weight: bold; }
-  .card .value { font-size: 16px; font-weight: bold; color: #0f172a; margin-top: 4px; }
+  .card-spacer {
+    display: table-cell;
+    width: 4%;
+  }
+  .label { 
+    font-size: 10px; 
+    color: #64748b; 
+    text-transform: uppercase; 
+    font-weight: bold; 
+  }
+  .value { 
+    font-size: 16px; 
+    font-weight: bold; 
+    color: #0f172a; 
+    margin-top: 4px; 
+  }
   .section-title {
     font-size: 14px;
     font-weight: bold;
@@ -121,13 +145,14 @@ HTML_TEMPLATE = """
     border-bottom: 2px solid #e2e8f0;
     padding-bottom: 5px;
     margin-top: 20px;
+    margin-bottom: 10px;
   }
   .content-box {
-    background: #ffffff;
+    background-color: #ffffff !important;
     border: 1px solid #e2e8f0;
     padding: 15px;
     border-radius: 6px;
-    font-size: 11px;
+    font-size: 10.5pt;
     white-space: pre-wrap;
     line-height: 1.5;
     color: #334155;
@@ -141,14 +166,17 @@ HTML_TEMPLATE = """
     <div class="vin-tag">VIN: {{ vin }}</div>
   </div>
 
-  <div class="grid">
-    <div class="card">
-      <div class="label">Last Mileage</div>
-      <div class="value">{{ mileage }}</div>
-    </div>
-    <div class="card">
-      <div class="label">Report Status</div>
-      <div class="value" style="color: #16a34a;">Verified Data</div>
+  <div class="grid-table">
+    <div class="grid-row">
+      <div class="card-cell">
+        <div class="label">Last Mileage</div>
+        <div class="value">{{ mileage }}</div>
+      </div>
+      <div class="card-spacer"></div>
+      <div class="card-cell">
+        <div class="label">Report Status</div>
+        <div class="value" style="color: #16a34a;">Verified Data</div>
+      </div>
     </div>
   </div>
 
@@ -186,6 +214,8 @@ if uploaded_file is not None:
             )
         except Exception as e:
             st.error(f"PDF Convert Error: {str(e)}")
+    else:
+        st.error("WeasyPrint library load nahi ho saki. Packages check karein.")
     
     st.download_button(
         label="🌐 Download Mobile HTML Version",
