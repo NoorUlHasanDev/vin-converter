@@ -1,4 +1,0 @@
-pdfplumber
-weasyprint
-streamlit
-jinja2
